@@ -1,0 +1,24 @@
+/* Copyright 2017 Piotr Marczyński */
+
+body {
+	font-size: 16px;
+	max-width: 1200px;
+	margin: auto;
+}
+.parkSimLayer {
+	margin: -675px 0 2em;
+	cursor: default;
+	display: block;
+	background-color: transparent;
+	overflow: hidden;
+	position: relative;
+	box-shadow: none;
+}
+.parkSimLayer:first-child {
+	margin: 2em 0 0;
+	background-color: #fff;
+	box-shadow: 0 0.5em 2em rgba(0, 0, 0, 0.5);
+}
+.credits {
+	float: right;
+}
