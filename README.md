@@ -6,6 +6,10 @@ Sterowanie strzałkami lub "w", "a", "s", "d". Dodatkowo "q" i "e" powoli obraca
 
 ## Changelog
 
+### 2017-10-22
+
+Dodanie możliwości sterowania wieloma samochodami.
+
 ### 2017-10-17
 
 Utworzenie dla projektu repozytorium.

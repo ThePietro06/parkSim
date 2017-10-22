@@ -8,8 +8,9 @@ const SIZE_RATIO = 0.3; // [cm/px] Liczba cm wyświetlanych na długości 1 px
 const UPS = 60; // [1/s] liczba aktualizacji na sekundę 
 const WHEELBASE = 258; // [cm] rozstaw osi
 const MAX_TURN_ANGLE = 0.60; // [rad] maksymalny kąt skrętu przedniej osi
-const ACCELERATION = 800; // [cm/s^2] przyspieszenie samochodu
-const TRACTION_CONTROL = 0.0005; // Większa liczba - silniejsze ograniczenie prędkości obrotu przedniej osi przy dużej prędkości samochodu
+const ACCELERATION = 500; // [cm/s^2] przyspieszenie samochodu
+const VELOCITY_LOSS = 0.075; // [1/s] część prędkości, jaką samochód utraci w czasie 1 sekundy
+const TURN_SPEED_REDUCTION = 0.0005; // większa liczba - silniejsze ograniczenie prędkości obrotu przedniej osi przy dużej prędkości samochodu
 const CONSTANT_FRICTION = 100; // [cm/s] stały ubytek prędkości
 const BREAKING_FRICTION = 1000; // [cm/s] ubytek prędkości wskutek hamowania
 const EMERGENCY_BREAKING_FRICTION = 3000; // [cm/s] ubytek prędkości wskutek hamowania awaryjnego
@@ -42,22 +43,22 @@ const KEYS = {
 };
 
 var car = {
-	pos_x: WIDTH/2/SIZE_RATIO, // Położenie samochodu wyrażone jest w cm od lewego dolnego rogu. Obowiązuje kartezjański układ współrzędnych.
-	pos_y: HEIGHT/3/SIZE_RATIO,
-	pos_rot: 0,
-	axis_rot: 0,
-	vel: 0,
-	accel: 0,
-	turn_radius: Infinity
+	pos_x: WIDTH/2/SIZE_RATIO, // [cm] położenie samochodu od lewego dolnego rogu układu odniesienia. Obowiązuje kartezjański układ współrzędnych.
+	pos_y: HEIGHT/4/SIZE_RATIO, // [cm]
+	pos_rot: 0, // [rad] kąt obrotu samochodu względem układu odniesienia
+	axis_rot: 0, // [rad] kąt obrotu osi przedniej względem osi tylniej
+	vel: 0, // [cm/s] chwilowa prędkość samochodu
+	accel: 0, // [cm/s^2] chwilowe przyspieszenie samochodu
+	turn_radius: Infinity, // [cm] promień skrętu
 };
 
 var controls = {
-	forward: 0,
-	backward: 0,
-	right: 0,
-	left: 0,
-	right_precise: 0,
-	left_precise: 0
+	forward: false,
+	backward: false,
+	right: false,
+	left: false,
+	right_precise: false,
+	left_precise: false
 };
 
 var update = function(e) {
@@ -99,7 +100,7 @@ var update = function(e) {
 			car.axis_rot = turn_dir * MAX_TURN_ANGLE;
 		}
 		else {
-			car.axis_rot += turn_dir * TURN_SPEED * Math.exp(- Math.abs(car.vel) * TRACTION_CONTROL) / UPS;
+			car.axis_rot += turn_dir * TURN_SPEED * Math.exp(- Math.abs(car.vel) * TURN_SPEED_REDUCTION) / UPS;
 		}
 	}
 	
@@ -111,7 +112,7 @@ var update = function(e) {
 			car.axis_rot = turn_dir * MAX_TURN_ANGLE;
 		}
 		else {
-			car.axis_rot += turn_dir * TURN_SPEED_PRECISE * Math.exp(- Math.abs(car.vel) * TRACTION_CONTROL) / UPS;
+			car.axis_rot += turn_dir * TURN_SPEED_PRECISE * Math.exp(- Math.abs(car.vel) * TURN_SPEED_REDUCTION) / UPS;
 		}
 	}
 	
@@ -121,6 +122,7 @@ var update = function(e) {
 		car.vel = 0;
 	}
 	else {
+		car.vel *= 1 - VELOCITY_LOSS / UPS;
 		car.vel -= Math.sign(car.vel) * CONSTANT_FRICTION / UPS;
 	}
 	car.vel += car.accel / UPS;
@@ -150,8 +152,21 @@ var update = function(e) {
 
 
 var recieveHandler = function(e) {
-	if(typeof KEYS[e.data.key] !== 'undefined')
-		controls[KEYS[e.data.key]] = e.data.pressing;
+	if(typeof e.data.key !== 'undefined') {
+		if(typeof KEYS[e.data.key] !== 'undefined') {
+			controls[KEYS[e.data.key]] = e.data.pressing;
+		}
+	}
+	else {
+		if(!e.data.focus) {
+			controls.forward = false;
+			controls.backward = false;
+			controls.right = false;
+			controls.left = false;
+			controls.right_precise = false;
+			controls.left_precise = false;
+		}
+	}
 };
 
 this.addEventListener("message", recieveHandler, false);

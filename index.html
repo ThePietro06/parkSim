@@ -13,11 +13,14 @@
 	<![endif]-->
 </head>
 <body>
-	<div id="parkSimCar" class="parkSimLayer" style="width: 1200px; height: 675px;" oncontextmenu="return false"></div>
+	<div id="parkSim" class="parkSimLayer" style="width: 1200px; height: 675px;" oncontextmenu="return false"></div>
 	<p class="credits">&copy; 2017 Piotr Marczyński</p>
 	<p class="options">
 		<label><input type="checkbox" id="show-trail" checked> Pokazuj tor ruchu</label>&emsp;
-		<label><input type="checkbox" id="fix-camera"> Nieruchoma kamera</label>
+		<label><input type="checkbox" id="fix-camera"> Nieruchoma kamera</label>&emsp;
+		<button id="add-car">Dodaj samochód</button>&emsp;
+		<button id="remove-car">Usuń samochód</button>
+		<div id="velocity"></div>
 	</p>
 	<script type="text/javascript" src="parkSim.js"></script>
 </body>
